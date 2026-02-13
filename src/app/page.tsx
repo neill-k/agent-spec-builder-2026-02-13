@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { generateSpecMarkdown, type SpecInput } from "@/lib/spec";
 import { presets } from "@/lib/presets";
 import { decodeSpecState, encodeSpecState } from "@/lib/share";
+import { lintSpec } from "@/lib/lint";
 
 const empty: SpecInput = {
   appName: "Agent Spec",
@@ -55,6 +56,7 @@ export default function Home() {
   }, []);
 
   const md = useMemo(() => generateSpecMarkdown(input), [input]);
+  const findings = useMemo(() => lintSpec(input), [input]);
 
   async function copy() {
     try {
@@ -280,6 +282,31 @@ export default function Home() {
               {toast}
             </div>
           ) : null}
+
+          <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-medium text-zinc-900">Spec lint</div>
+              <div className="text-xs text-zinc-600">
+                {findings.length === 0
+                  ? "No obvious gaps"
+                  : `${findings.length} suggestion${findings.length === 1 ? "" : "s"}`}
+              </div>
+            </div>
+            {findings.length ? (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-zinc-700">
+                {findings.map((f) => (
+                  <li key={f.id}>
+                    <span className="font-medium">{f.title}</span>
+                    {f.detail ? <span className="text-zinc-600"> — {f.detail}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-2 text-xs text-zinc-600">
+                Looks decent for an MVP. If you’re handing this to an engineer, add one or two concrete eval cases next.
+              </div>
+            )}
+          </div>
 
           <pre className="mt-4 max-h-[75vh] overflow-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 text-xs leading-5 text-zinc-100">
             <code>{md}</code>
