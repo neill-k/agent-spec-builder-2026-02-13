@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateSpecMarkdown, type SpecInput } from "@/lib/spec";
 import { presets } from "@/lib/presets";
 
@@ -33,6 +33,14 @@ export default function Home() {
   const [input, setInput] = useState<SpecInput>(empty);
   const [toast, setToast] = useState<string>("");
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const exampleId = new URLSearchParams(window.location.search).get("example");
+    if (!exampleId) return;
+    const preset = presets.find((p) => p.id === exampleId);
+    if (preset) setInput(preset.data);
+  }, []);
+
   const md = useMemo(() => generateSpecMarkdown(input), [input]);
 
   async function copy() {
@@ -60,7 +68,13 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <a
+              href="/examples"
+              className="text-sm text-zinc-600 hover:text-zinc-900"
+            >
+              Examples
+            </a>
             <a
               href="https://github.com"
               className="text-sm text-zinc-600 hover:text-zinc-900"
