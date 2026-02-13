@@ -31,6 +31,10 @@ npm run dev
 
 Open http://localhost:3000
 
+## Live Demo
+
+- https://agent-spec-builder-2026-02-13.vercel.app
+
 ## Stack
 
 - Next.js (App Router)
