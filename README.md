@@ -1,28 +1,34 @@
-# Agent Spec Builder (MVP)
+# Agent Spec Builder
 
-Generate a clear, copy/pasteable **agentic system spec** (as Markdown) from a small set of inputs: objective, users, tools, data, constraints, and success metrics.
+Turn an agent idea into an **engineer-ready Markdown spec** in a couple minutes.
 
-## Builder Notes (goals, interests, plan, strategy)
+- Fill in: objective, users, tools, data sources, constraints, success criteria
+- Get: a structured spec (architecture + guardrails + eval plan) you can paste into a repo or ticket
+- Privacy-first: everything runs **client-side** (no backend)
 
-**Goals**
-- Ship a tiny, practical planning tool that helps teams go from “idea” → “implementable agent spec” fast.
-- Emphasize architecture clarity: components, tool contracts, eval plan, and guardrails.
+Live demo: https://agent-spec-builder-2026-02-13.vercel.app
 
-**Interests**
-- Agent/product design, tool-using architectures, evaluation-driven delivery, and pragmatic safety.
+## Who this is for
 
-**Plan**
-- Single-page app with a form + live-generated Markdown.
-- “Copy” + “Download .md” actions.
-- Keep dependencies minimal (Next.js + TS + Tailwind only).
+- Product/eng teams scoping an agentic workflow
+- Forward-deployed / solutions folks who need a crisp delivery artifact fast
+- Anyone tired of “vibes-based” agent ideas
 
-**Strategy**
-- Favor shipping a useful template over trying to be “smart”.
-- Encode best-practice structure (tools, data flow, evals, risks) so the output is immediately actionable.
+## How to use
 
----
+1. Pick a preset (or start from scratch).
+2. Fill in the form.
+3. Copy the generated Markdown or download `SPEC.md`.
+4. (Optional) Click **Share link** to send a draft spec without a backend.
 
-## Getting Started
+## Local dev
+
+```bash
+pnpm install
+pnpm dev
+```
+
+If you don’t use pnpm:
 
 ```bash
 npm install
@@ -30,10 +36,6 @@ npm run dev
 ```
 
 Open http://localhost:3000
-
-## Live Demo
-
-- https://agent-spec-builder-2026-02-13.vercel.app
 
 ## Stack
 
@@ -43,4 +45,4 @@ Open http://localhost:3000
 
 ## Deploy
 
-This app is designed to deploy cleanly on Vercel.
+Designed to deploy cleanly on Vercel.
