@@ -9,6 +9,11 @@ export type SpecInput = {
   successMetrics: string;
   nonGoals: string;
   risks: string;
+  // Budget / performance targets (keep as strings to stay flexible)
+  p95Latency: string;
+  maxCostPerDay: string;
+  maxRetries: string;
+  degradeTo: string;
 };
 
 function bulletize(text: string): string[] {
@@ -28,6 +33,11 @@ function section(title: string, body: string): string {
 function bullets(lines: string[], fallback?: string): string {
   if (lines.length === 0) return fallback ? `- ${fallback}` : "- (TBD)";
   return lines.map((l) => `- ${l}`).join("\n");
+}
+
+function kv(label: string, value: string, fallback: string) {
+  const v = value.trim();
+  return `- **${label}:** ${v || fallback}`;
 }
 
 export function generateSpecMarkdown(input: SpecInput): string {
@@ -51,6 +61,13 @@ export function generateSpecMarkdown(input: SpecInput): string {
         .join("\n")
     : "(None yet)";
 
+  const budget = [
+    kv("p95 latency", input.p95Latency, "(TBD)"),
+    kv("Max cost/day", input.maxCostPerDay, "(TBD)"),
+    kv("Max retries", input.maxRetries, "(TBD)"),
+    kv("Degrade to", input.degradeTo, "(TBD — e.g., human handoff, safer mode, or partial output)"),
+  ].join("\n");
+
   return [
     `# ${name}\n`,
     `**Generated:** ${now.toISOString()}\n`,
@@ -67,6 +84,7 @@ export function generateSpecMarkdown(input: SpecInput): string {
     ),
     section("Success Metrics", bullets(metrics, "Define measurable outcomes")),
     section("Constraints", bullets(constraints, "List hard constraints")),
+    section("Cost / Latency Budget", budget),
     section("Non-goals", bullets(nonGoals, "Explicitly exclude out-of-scope items")),
     section(
       "High-level Architecture",
@@ -80,9 +98,13 @@ export function generateSpecMarkdown(input: SpecInput): string {
     ),
     section(
       "Tools",
-      [bullets(tools, "List the tools the agent can call"), "", "### Tool Contracts", "", toolContracts].join(
-        "\n"
-      )
+      [
+        bullets(tools, "List the tools the agent can call"),
+        "",
+        "### Tool Contracts",
+        "",
+        toolContracts,
+      ].join("\n")
     ),
     section(
       "Data Sources",

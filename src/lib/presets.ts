@@ -7,11 +7,19 @@ export type Preset = {
   data: SpecInput;
 };
 
+const budgetDefaults = {
+  p95Latency: "",
+  maxCostPerDay: "",
+  maxRetries: "",
+  degradeTo: "",
+};
+
 export const presets: Preset[] = [
   {
     id: "support-triage",
     label: "Support Triage Agent",
-    description: "Triage, draft replies, and route inbound tickets with human approval.",
+    description:
+      "Triage, draft replies, and route inbound tickets with human approval.",
     data: {
       appName: "Support Triage Agent Spec",
       objective:
@@ -35,17 +43,19 @@ export const presets: Preset[] = [
       constraints: [
         "No automated external responses without explicit human approval",
         "Respect PII handling policies",
-        "Latency: < 10s for suggested triage",
       ].join("\n"),
+      p95Latency: "<= 10s",
+      maxCostPerDay: "<= $50/day",
+      maxRetries: "2",
+      degradeTo: "Human handoff + safe draft response",
       successMetrics: [
         "Time-to-first-response reduced by 30%",
         "Correct routing accuracy >= 90%",
         "Escalation precision (avoid false pages)",
       ].join("\n"),
-      nonGoals: [
-        "Fully autonomous ticket closure",
-        "Training custom models",
-      ].join("\n"),
+      nonGoals: ["Fully autonomous ticket closure", "Training custom models"].join(
+        "\n"
+      ),
       risks: [
         "Misclassification causing missed SLAs",
         "Over-escalation to on-call",
@@ -81,6 +91,7 @@ export const presets: Preset[] = [
         "Citations required for each answer",
         "Access control: SOC2 restricted",
       ].join("\n"),
+      ...budgetDefaults,
       successMetrics: [
         "Draft completion time reduced by 50%",
         "Fewer back-and-forth clarifications",
@@ -98,7 +109,8 @@ export const presets: Preset[] = [
   {
     id: "meeting-notes",
     label: "Meeting Notes + Action Items Agent",
-    description: "Turn transcripts into crisp notes, decisions, and follow-ups (with guardrails).",
+    description:
+      "Turn transcripts into crisp notes, decisions, and follow-ups (with guardrails).",
     data: {
       appName: "Meeting Notes Agent Spec",
       objective:
@@ -122,6 +134,7 @@ export const presets: Preset[] = [
         "Include 2–5 direct quotes as anchors for key decisions",
         "Respect confidentiality markers in the transcript",
       ].join("\n"),
+      ...budgetDefaults,
       successMetrics: [
         "Notes published within 10 minutes",
         "Action item capture rate >= 90%",
@@ -141,7 +154,8 @@ export const presets: Preset[] = [
   {
     id: "itsm-routing",
     label: "ITSM Ticket Routing Agent",
-    description: "Classify and route internal IT requests; suggest fixes; avoid risky automation.",
+    description:
+      "Classify and route internal IT requests; suggest fixes; avoid risky automation.",
     data: {
       appName: "ITSM Routing Agent Spec",
       objective:
@@ -155,24 +169,22 @@ export const presets: Preset[] = [
         "Runbook search",
         "Identity directory lookup (read-only)",
       ].join("\n"),
-      dataSources: [
-        "ITSM ticket history",
-        "Runbooks / KB",
-        "Known-issues list",
-      ].join("\n"),
+      dataSources: ["ITSM ticket history", "Runbooks / KB", "Known-issues list"].join(
+        "\n"
+      ),
       constraints: [
         "Never reset passwords or change access autonomously",
         "Prefer safer suggestions with links to runbooks",
         "Escalate security-sensitive tickets immediately",
       ].join("\n"),
+      ...budgetDefaults,
       successMetrics: [
         "Routing accuracy >= 92%",
         "Mean time to assignment reduced by 40%",
       ].join("\n"),
-      nonGoals: [
-        "Executing remediation commands",
-        "Changing IAM permissions",
-      ].join("\n"),
+      nonGoals: ["Executing remediation commands", "Changing IAM permissions"].join(
+        "\n"
+      ),
       risks: [
         "Incorrect routing causing delays",
         "Sensitive data exposure (credentials, access details)",
@@ -182,7 +194,8 @@ export const presets: Preset[] = [
   {
     id: "exec-briefing",
     label: "Executive Briefing Agent",
-    description: "Weekly top-line business + product briefing with sources and confidence tags.",
+    description:
+      "Weekly top-line business + product briefing with sources and confidence tags.",
     data: {
       appName: "Executive Briefing Agent Spec",
       objective:
@@ -196,26 +209,21 @@ export const presets: Preset[] = [
         "Incident log: read",
         "Email/Slack: send briefing (requires approval)",
       ].join("\n"),
-      dataSources: [
-        "Weekly KPI dashboard",
-        "OKRs",
-        "Incident reports",
-        "Release notes",
-      ].join("\n"),
+      dataSources: ["Weekly KPI dashboard", "OKRs", "Incident reports", "Release notes"].join(
+        "\n"
+      ),
       constraints: [
         "Cite sources for metrics claims",
         "Tag uncertain statements explicitly",
         "Keep to 1 page / 5 minutes read",
       ].join("\n"),
+      ...budgetDefaults,
       successMetrics: [
         "Briefing delivered by Monday 09:00",
         "Exec satisfaction (qualitative)",
         "Fewer status meetings needed",
       ].join("\n"),
-      nonGoals: [
-        "Making roadmap commitments",
-        "Publishing externally",
-      ].join("\n"),
+      nonGoals: ["Making roadmap commitments", "Publishing externally"].join("\n"),
       risks: [
         "Stale data leading to wrong decisions",
         "Overconfident narrative without caveats",

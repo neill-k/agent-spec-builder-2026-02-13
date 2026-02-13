@@ -11,6 +11,10 @@ const EMPTY: SpecInput = {
   successMetrics: "",
   nonGoals: "",
   risks: "",
+  p95Latency: "",
+  maxCostPerDay: "",
+  maxRetries: "",
+  degradeTo: "",
 };
 
 function base64UrlEncode(input: string) {
