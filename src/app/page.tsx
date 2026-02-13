@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { generateSpecMarkdown, type SpecInput } from "@/lib/spec";
 import { presets } from "@/lib/presets";
+import { decodeSpecState, encodeSpecState } from "@/lib/share";
 
 const empty: SpecInput = {
   appName: "Agent Spec",
@@ -35,7 +36,19 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const exampleId = new URLSearchParams(window.location.search).get("example");
+
+    const params = new URLSearchParams(window.location.search);
+
+    const shared = params.get("s");
+    if (shared) {
+      const decoded = decodeSpecState(shared);
+      if (decoded) {
+        setInput(decoded);
+        return;
+      }
+    }
+
+    const exampleId = params.get("example");
     if (!exampleId) return;
     const preset = presets.find((p) => p.id === exampleId);
     if (preset) setInput(preset.data);
@@ -49,6 +62,21 @@ export default function Home() {
       setToast("Copied to clipboard.");
     } catch {
       setToast("Copy failed (browser blocked clipboard). Use manual copy.");
+    } finally {
+      window.setTimeout(() => setToast(""), 2500);
+    }
+  }
+
+  async function copyShareLink() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("example");
+      params.set("s", encodeSpecState(input));
+      const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+      await navigator.clipboard.writeText(url);
+      setToast("Share link copied.");
+    } catch {
+      setToast("Couldn’t create share link (too long or browser blocked clipboard).");
     } finally {
       window.setTimeout(() => setToast(""), 2500);
     }
@@ -220,6 +248,14 @@ export default function Home() {
                 type="button"
               >
                 Copy
+              </button>
+              <button
+                className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+                onClick={copyShareLink}
+                type="button"
+                title="Copy a shareable link that includes the current inputs"
+              >
+                Share link
               </button>
               <button
                 className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50"
