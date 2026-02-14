@@ -15,6 +15,7 @@ const EMPTY: SpecInput = {
   maxCostPerDay: "",
   maxRetries: "",
   degradeTo: "",
+  toolContracts: [],
 };
 
 function base64UrlEncode(input: string) {
@@ -46,8 +47,9 @@ export function decodeSpecState(encoded: string): SpecInput | null {
     const out: SpecInput = {
       ...EMPTY,
       ...Object.fromEntries(
-        Object.entries(raw ?? {}).map(([k, v]) => [k, typeof v === "string" ? v : ""]) // avoid weird types
+        Object.entries(raw ?? {}).map(([k, v]) => [k, typeof v === "string" ? v : v])
       ),
+      toolContracts: Array.isArray(raw.toolContracts) ? raw.toolContracts : [],
     } as SpecInput;
     return out;
   } catch {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { generateSpecMarkdown, type SpecInput } from "@/lib/spec";
+import { generateSpecMarkdown, type SpecInput, type ToolContract } from "@/lib/spec";
 import { presets } from "@/lib/presets";
 import { decodeSpecState, encodeSpecState } from "@/lib/share";
 import { lintSpec } from "@/lib/lint";
@@ -21,6 +21,7 @@ const empty: SpecInput = {
   maxCostPerDay: "",
   maxRetries: "",
   degradeTo: "",
+  toolContracts: [],
 };
 
 function downloadText(filename: string, text: string) {
@@ -191,6 +192,170 @@ export default function Home() {
               ].join("\n")}
               rows={5}
             />
+
+            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm font-medium text-zinc-800">
+                  Tool Contracts (structured)
+                </div>
+                <button
+                  type="button"
+                  className="rounded-lg bg-zinc-900 px-2 py-1 text-xs font-medium text-white hover:bg-zinc-800"
+                  onClick={() => {
+                    const newContract: ToolContract = {
+                      id: crypto.randomUUID(),
+                      name: "",
+                      purpose: "",
+                      auth: "",
+                      rateLimit: "",
+                      inputs: "",
+                      outputs: "",
+                      failureModes: "",
+                      piiHandling: "",
+                      idempotent: false,
+                    };
+                    setInput({
+                      ...input,
+                      toolContracts: [...(input.toolContracts || []), newContract],
+                    });
+                  }}
+                >
+                  + Add tool
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-zinc-600">
+                Add structured contracts for each tool (auth, rate limits, error modes, PII, idempotency).
+              </p>
+
+              {input.toolContracts && input.toolContracts.length > 0 && (
+                <div className="mt-3 space-y-3">
+                  {input.toolContracts.map((tc, idx) => (
+                    <div
+                      key={tc.id}
+                      className="rounded-lg border border-zinc-200 bg-white p-3"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <input
+                          value={tc.name}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, name: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Tool name (e.g., Slack: post message)"
+                          className="flex-1 rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-sm"
+                        />
+                        <button
+                          type="button"
+                          className="text-xs text-red-600 hover:text-red-800"
+                          onClick={() => {
+                            const updated = input.toolContracts.filter(
+                              (_, i) => i !== idx
+                            );
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="mt-2 grid gap-2 md:grid-cols-2">
+                        <input
+                          value={tc.purpose}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, purpose: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Purpose (what does this tool do?)"
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                        <input
+                          value={tc.auth}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, auth: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Auth (e.g., OAuth2, API key, user-approved)"
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                        <input
+                          value={tc.rateLimit}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, rateLimit: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Rate limit (e.g., 100 req/min)"
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={tc.idempotent}
+                            onChange={(e) => {
+                              const updated = [...input.toolContracts];
+                              updated[idx] = { ...tc, idempotent: e.target.checked };
+                              setInput({ ...input, toolContracts: updated });
+                            }}
+                            className="h-4 w-4"
+                          />
+                          <span className="text-xs text-zinc-700">Idempotent</span>
+                        </div>
+                      </div>
+                      <div className="mt-2 grid gap-2 md:grid-cols-2">
+                        <textarea
+                          value={tc.inputs}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, inputs: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Inputs (what data does it need?)"
+                          rows={2}
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                        <textarea
+                          value={tc.outputs}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, outputs: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Outputs (what does it return?)"
+                          rows={2}
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                      </div>
+                      <div className="mt-2 grid gap-2 md:grid-cols-2">
+                        <textarea
+                          value={tc.failureModes}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, failureModes: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="Failure modes (what can go wrong?)"
+                          rows={2}
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                        <textarea
+                          value={tc.piiHandling}
+                          onChange={(e) => {
+                            const updated = [...input.toolContracts];
+                            updated[idx] = { ...tc, piiHandling: e.target.value };
+                            setInput({ ...input, toolContracts: updated });
+                          }}
+                          placeholder="PII handling (any personal data?)"
+                          rows={2}
+                          className="rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <TextArea
               label="Data sources (one per line)"
               value={input.dataSources}

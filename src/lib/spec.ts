@@ -1,3 +1,16 @@
+export type ToolContract = {
+  id: string;
+  name: string;
+  purpose: string;
+  auth: string;
+  rateLimit: string;
+  inputs: string;
+  outputs: string;
+  failureModes: string;
+  piiHandling: string;
+  idempotent: boolean;
+};
+
 export type SpecInput = {
   appName: string;
   objective: string;
@@ -14,6 +27,8 @@ export type SpecInput = {
   maxCostPerDay: string;
   maxRetries: string;
   degradeTo: string;
+  // Structured tool contracts
+  toolContracts: ToolContract[];
 };
 
 function bulletize(text: string): string[] {
@@ -52,14 +67,22 @@ export function generateSpecMarkdown(input: SpecInput): string {
   const name = input.appName.trim() || "Agent Spec";
   const objective = input.objective.trim() || "(TBD)";
 
-  const toolContracts = tools.length
-    ? tools
-        .map(
-          (t) =>
-            `### ${t}\n\n**Purpose:** (TBD)\n\n**Inputs:**\n- (TBD)\n\n**Outputs:**\n- (TBD)\n\n**Failure modes:**\n- (TBD)\n`
-        )
-        .join("\n")
-    : "(None yet)";
+  const toolContracts =
+    input.toolContracts && input.toolContracts.length > 0
+      ? input.toolContracts
+          .map(
+            (tc) =>
+              `### ${tc.name || "Unnamed Tool"}\n\n**Purpose:** ${tc.purpose.trim() || "(TBD)"}\n\n**Auth:** ${tc.auth.trim() || "(TBD)"}\n\n**Rate limit:** ${tc.rateLimit.trim() || "(TBD)"}\n\n**Inputs:**\n${tc.inputs.trim() || "- (TBD)"}\n\n**Outputs:**\n${tc.outputs.trim() || "- (TBD)"}\n\n**Failure modes:**\n${tc.failureModes.trim() || "- (TBD)"}\n\n**PII handling:** ${tc.piiHandling.trim() || "(TBD)"}\n\n**Idempotent:** ${tc.idempotent ? "Yes" : "No (requires deduplication)"}`
+          )
+          .join("\n\n")
+      : tools.length
+        ? tools
+            .map(
+              (t) =>
+                `### ${t}\n\n**Purpose:** (TBD)\n\n**Inputs:**\n- (TBD)\n\n**Outputs:**\n- (TBD)\n\n**Failure modes:**\n- (TBD)\n`
+            )
+            .join("\n")
+        : "(None yet)";
 
   const budget = [
     kv("p95 latency", input.p95Latency, "(TBD)"),

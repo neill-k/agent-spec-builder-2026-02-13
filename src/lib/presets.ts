@@ -56,6 +56,7 @@ export const presets: Preset[] = [
       nonGoals: ["Fully autonomous ticket closure", "Training custom models"].join(
         "\n"
       ),
+      toolContracts: [],
       risks: [
         "Misclassification causing missed SLAs",
         "Over-escalation to on-call",
@@ -100,6 +101,7 @@ export const presets: Preset[] = [
         "Sending answers directly to customers",
         "Editing source-of-truth documents",
       ].join("\n"),
+      toolContracts: [],
       risks: [
         "Hallucinated claims without citations",
         "Accidental disclosure of restricted content",
@@ -144,6 +146,7 @@ export const presets: Preset[] = [
         "Making binding decisions",
         "Auto-scheduling people without consent",
       ].join("\n"),
+      toolContracts: [],
       risks: [
         "Misattributing action items",
         "Leaking sensitive content",
@@ -185,6 +188,7 @@ export const presets: Preset[] = [
       nonGoals: ["Executing remediation commands", "Changing IAM permissions"].join(
         "\n"
       ),
+      toolContracts: [],
       risks: [
         "Incorrect routing causing delays",
         "Sensitive data exposure (credentials, access details)",
@@ -224,6 +228,7 @@ export const presets: Preset[] = [
         "Fewer status meetings needed",
       ].join("\n"),
       nonGoals: ["Making roadmap commitments", "Publishing externally"].join("\n"),
+      toolContracts: [],
       risks: [
         "Stale data leading to wrong decisions",
         "Overconfident narrative without caveats",
