@@ -5,6 +5,8 @@ import { generateSpecMarkdown, type SpecInput, type ToolContract } from "@/lib/s
 import { presets } from "@/lib/presets";
 import { decodeSpecState, encodeSpecState } from "@/lib/share";
 import { lintSpec } from "@/lib/lint";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const empty: SpecInput = {
   appName: "Agent Spec",
@@ -62,6 +64,7 @@ export default function Home() {
 
   const md = useMemo(() => generateSpecMarkdown(input), [input]);
   const findings = useMemo(() => lintSpec(input), [input]);
+  const [previewMode, setPreviewMode] = useState<"raw" | "preview">("raw");
 
   async function copy() {
     try {
@@ -440,12 +443,36 @@ export default function Home() {
         <section className="rounded-xl border border-zinc-200 bg-white p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold">Generated Spec (Markdown)</h2>
+              <h2 className="text-base font-semibold">Generated Spec</h2>
               <p className="text-sm text-zinc-600">
                 Copy/paste into a repo, doc, ticket, or PRD.
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+                <button
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    previewMode === "raw"
+                      ? "bg-white shadow-sm text-zinc-900"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                  onClick={() => setPreviewMode("raw")}
+                  type="button"
+                >
+                  Raw
+                </button>
+                <button
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    previewMode === "preview"
+                      ? "bg-white shadow-sm text-zinc-900"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                  onClick={() => setPreviewMode("preview")}
+                  type="button"
+                >
+                  Preview
+                </button>
+              </div>
               <button
                 className="rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
                 onClick={copy}
@@ -513,9 +540,15 @@ export default function Home() {
             )}
           </div>
 
-          <pre className="mt-4 max-h-[75vh] overflow-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 text-xs leading-5 text-zinc-100">
-            <code>{md}</code>
-          </pre>
+          {previewMode === "raw" ? (
+            <pre className="mt-4 max-h-[75vh] overflow-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 text-xs leading-5 text-zinc-100">
+              <code>{md}</code>
+            </pre>
+          ) : (
+            <div className="mt-4 max-h-[75vh] overflow-auto rounded-xl border border-zinc-200 bg-white p-4 prose prose-sm prose-zinc max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{md}</ReactMarkdown>
+            </div>
+          )}
 
           <div className="mt-4 text-xs text-zinc-500">
             MVP note: this tool intentionally avoids calling an LLM. It encodes a
